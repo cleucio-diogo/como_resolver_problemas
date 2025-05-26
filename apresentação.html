@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Metodologia de Resolução de Problemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            background: linear-gradient(120deg, #06163a 0%, #08215A 100%);
+            color: #b0b8c9;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .tabs {
+            max-width: 980px;
+            margin: 48px auto 0 auto;
+            background: rgba(8,33,90,0.97);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.28);
+            padding: 0 0 36px 0;
+        }
+        .tab-buttons {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            background: #08215A;
+            border-bottom: 2px solid #49C4E5;
+            border-radius: 20px 20px 0 0;
+            position: relative; 
+        }
+        .tab-buttons::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-buttons button {
+            flex: 0 0 auto;
+            min-width: 140px; 
+            max-width: none;
+            white-space: nowrap;
+            background: #08215A;
+            border: none;
+            outline: none;
+            color: #b0b8c9;
+            font-size: 1.15rem;
+            font-weight: bold;
+            padding: 18px 20px 14px 20px; 
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, background 0.3s;
+            border-radius: 10px 10px 0 0;
+            /* Adicionado para melhor responsividade ao toque em iOS */
+            touch-action: manipulation; 
+        }
+        .tab-buttons button.active {
+            color: #49C4E5;
+            background: #0d1a3a;
+        }
+        .tab-indicator {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 3px;
+            background: #49C4E5;
+            border-radius: 2px 2px 0 0;
+            transition: width 0.35s cubic-bezier(.4,0,.2,1), left 0.35s cubic-bezier(.4,0,.2,1);
+            z-index: 2;
+        }
+        .tab-content {
+            display: none;
+            padding: 38px 48px 0 48px;
+            animation: fadeIn 0.5s;
+            min-height: 400px;
+            color: #b0b8c9;
+        }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        h1, h2 {
+            color: #49C4E5;
+            margin-top: 0;
+        }
+        h2 { font-size: 1.5rem; margin-bottom: 18px; }
+        h3 { color: #49C4E5; margin-top: 30px; }
+        .highlight { color: #49C4E5; font-weight: bold; }
+        .example, .reflection {
+            background: #0d233f;
+            border-left: 4px solid #49C4E5;
+            padding: 10px 18px;
+            border-radius: 6px;
+            color: #49C4E5;
+            font-style: italic;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .important {
+            background: #23396c;
+            border-left: 6px solid #49C4E5;
+            color: #49C4E5;
+            padding: 16px 20px;
+            margin: 24px 0 24px 0;
+            border-radius: 6px;
+            font-weight: normal;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 20px 0;
+        }
+        th, td {
+            border: 1px solid #34588c;
+            padding: 7px;
+            color: #b0b8c9;
+            vertical-align: top;
+        }
+        th { background: #49C4E5; color: #08215A; }
+        ul, ol { margin: 0 0 0 18px; padding: 0; }
+        li { margin-bottom: 2px; }
+        .sumario-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            list-style: none;
+            font-size: 1.14rem;
+            padding-left: 0;
+            margin-top: 38px;
+            margin-bottom: 0;
+        }
+        .sumario-list > li {
+            margin-bottom: 0;
+        }
+        .sumario-list .sub-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-left: 32px;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+        .sumario-link {
+            color: #b0b8c9;
+            cursor: pointer; /* Garante que links do sumário sejam tratados como interativos */
+            text-decoration: none;
+            border-bottom: none;
+            transition: color 0.22s;
+            font-weight: 500;
+            padding: 7px 0 7px 0;
+            display: inline-block;
+            border-radius: 4px;
+            background: none;
+        }
+        .sumario-link:hover {
+            color: #49C4E5;
+            background: none;
+        }
+        .toggle-btn {
+            background: #23396c;
+            color: #49C4E5;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 12px;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .toggle-btn:hover {
+            background: #49C4E5;
+            color: #08215A;
+        }
+        @media (max-width: 900px) {
+            .tabs { padding: 0 0 16px 0; }
+            .tab-content { padding: 28px 5vw 0 5vw; }
+            .tab-buttons button { font-size: 1rem; padding: 12px 10px 10px 10px; min-width: 120px;}
+        }
+        @media (max-width: 600px) {
+            .tab-content { padding: 18px 2vw 0 2vw; }
+            h1 { font-size: 1.2rem; }
+            h2 { font-size: 1.05rem; }
+            .sumario-list { font-size: 1rem; gap: 4px; }
+            .sumario-list .sub-list { gap: 2px; margin-left: 14px; }
+            .tab-buttons button { font-size: 0.98rem; padding: 10px 8px 8px 8px; min-width: 100px;}
+        }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <div class="tab-buttons" id="tabButtons">
+            <button class="tablink active" onclick="openTab(event, 'sumario')">Sumário</button>
+            <button class="tablink" onclick="openTab(event, 'clareza')">Clareza</button>
+            <button class="tablink" onclick="openTab(event, 'planejamento')">Planejamento</button>
+            <button class="tablink" onclick="openTab(event, 'monitoramento')">Monitoramento</button>
+            <button class="tablink" onclick="openTab(event, 'feedback')">Feedback</button>
+            <button class="tablink" onclick="openTab(event, 'correcao')">Correção de curso</button>
+            <div class="tab-indicator" id="tabIndicator"></div>
+        </div>
+
+        <div id="sumario" class="tab-content active">
+            <div id="sumario-completo">
+                <h1>Metodologia de Resolução de Problemas</h1>
+                <ul class="sumario-list">
+                    <li><span class="sumario-link" onclick="openTabByName('clareza')">Clareza: entendendo o problema na raiz</span></li>
+                    <li>
+                        <span class="sumario-link" onclick="openTabByName('planejamento')">Planejamento: definindo a direção e materializando as ações</span>
+                        <ul class="sub-list">
+                            <li><span class="sumario-link" onclick="openTabByName('planejamento-estrategico')">Planejamento estratégico: quem somos e para onde vamos</span></li>
+                            <li><span class="sumario-link" onclick="openTabByName('planejamento-tatico')">Planejamento tático: estratégias e direcionamento das áreas</span></li>
+                            <li><span class="sumario-link" onclick="openTabByName('planejamento-operacional')">Planejamento operacional: execução e geração de valor</span></li>
+                        </ul>
+                    </li>
+                    <li><span class="sumario-link" onclick="openTabByName('monitoramento')">Monitoramento: controlando o progresso e coletando evidências</span></li>
+                    <li><span class="sumario-link" onclick="openTabByName('feedback')">Feedback: traduzindo dados em insights e orientação</span></li>
+                    <li><span class="sumario-link" onclick="openTabByName('correcao')">Correção de curso: ajustando a rota e materializando o aprendizado</span></li>
+                </ul>
+            </div>
+            <div id="sumario-resumido" style="display:none;">
+                <h2>Sumário (Resumo)</h2>
+                <ul>
+                    <li>Clareza: entenda o problema profundamente antes de agir.</li>
+                    <li>Planejamento: direcione e estruture as ações em 3 níveis.</li>
+                    <li>Monitoramento: acompanhe e registre o progresso.</li>
+                    <li>Feedback: transforme dados em orientação e aprendizado.</li>
+                    <li>Correção de curso: ajuste a rota com base em fatos.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="clareza" class="tab-content">
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="toggle-btn" onclick="toggleResumo('clareza')">Versão Resumida</button>
+            </div>
+            <div id="clareza-completo">
+                <h2>Clareza: entendendo o problema na raiz</h2>
+                <h3>Definição</h3>
+                <div>
+                    Etapa onde se deve compreender profundamente o que realmente precisa ser resolvido. Para isso, é fundamental conhecer e entender detalhadamente as premissas, os requisitos e as restrições que impactam ou influenciam o sucesso da sua iniciativa. Com base nesse conhecimento, será possível criar, validar ou, se necessário, redefinir o objetivo, garantindo que ele esteja alinhado com a realidade e as expectativas envolvidas. Só após esse entendimento sólido e alinhamento claro é que será possível avançar com segurança para a próxima fase do processo, minimizando riscos e aumentando as chances de sucesso.
+                </div>
+                <h3>Existe diferença entre objetivo e critérios de sucesso?</h3>
+                <div>
+                    A resposta sucinta é sim, existe diferença. Essa diferenciação se faz necessária para não chamarmos coisas parecidas por nomes iguais, visto que isso reduz a clareza e aumenta o ruído da comunicação.<br><br>
+                    Enquanto o <b>objetivo</b> é como uma <b>bússola</b>, que te dá a direção geral e te mostra para onde ir, com a ideia de comunicar a sua aspiração maior e o que você quer <b>conquistar</b>, os <b>critérios de sucesso</b> são como um <b>mapa do tesouro</b> que demonstra com um "X" exatamente onde você quer chegar. Eles te mostram exatamente como você vai saber se chegou lá, e se realmente encontrou o seu tesouro.
+                </div>
+                <div class="example">
+                    Enquanto os <span class="highlight">objetivos</span> são mais amplos e, normalmente qualitativos, os <span class="highlight">critérios de sucesso</span> são resultados mensuráveis e específicos que comprovam que o objetivo foi atingido. Eles respondem à pergunta: "Como saberemos que fomos bem-sucedidos?"
+                </div>
+                <h3>Existe diferença entre um problema e inconformidade?</h3>
+                <div>
+                    A resposta é sim, existe diferença.<br>
+                    A <span class="highlight">inconformidade</span> ocorre quando algo não está conforme o esperado ou definido, ou seja, é a constatação de que o resultado atual não atende a um padrão, regra ou requisito, indicando uma falha ou desvio visível. Já o <span class="highlight">problema</span> é a <b>causa ou motivo que explica por que essa inconformidade</b> aconteceu; é o desafio ou obstáculo que precisa ser identificado e resolvido para que o resultado esperado possa ser alcançado.
+                </div>
+                <div class="example">
+                    <ul>
+                        <li>A inconformidade é o “sintoma” - o que vemos que está errado.</li>
+                        <li>O problema é a “causa” - o que está gerando esse erro.</li>
+                    </ul>
+                </div>
+                <h3>Qual o motivo da confusão?</h3>
+                <div>
+                    A confusão entre esses termos acontece porque em alguns cenários essas duas definições podem se sobrepor, e nestes o problema e a inconformidade são representados pela mesma coisa. Abaixo segue alguns exemplos nos quais eles se sobrepõem:
+                    <ul>
+                        <li><b>Falha simples e direta:</b> Se uma peça de uma máquina está quebrada e isso impede seu funcionamento, a peça quebrada é a inconformidade (o sintoma) e também o problema, pois é a causa direta da parada. 
+                            <div class="example">
+                                Neste mesmo cenário, se a peça não estivesse disponível para troca, por falta de planejamento ou objeto de análise fosse o motivo da parada da máquina por uma hora, a inconformidade seria: a peça quebrada; enquanto o problema seria: a falta de planejamento na reposição das peças.
+                            </div>
+                        </li>
+                        <li><b>Erro evidente:</b> Quando um procedimento é executado incorretamente e isso gera um resultado errado, a execução incorreta é a inconformidade e, ao mesmo tempo, o problema a ser corrigido.
+                            <div class="example">
+                                Se neste caso, a execução incorreta aconteceu por falta de treinamento ou indisponibilidade dos recursos adequados, a inconformidade seria: a execução incorreta; enquanto o problema seria a falta de treinamento ou disponibilização dos recursos adequados
+                            </div>
+                        </li>
+                        <li><b>Não conformidade clara com padrão:</b>  
+                            Um produto que não atende a uma especificação técnica definida (por exemplo, uma dimensão fora do padrão) apresenta uma inconformidade que é, em si, o problema que precisa ser resolvido.
+                            <div class="example">
+                                Se nesse caso, não atender as especificações é o resultado do não entendimento das especificações ou de erro de produção, a não conformidade seria: não atender às especificações; enquanto o problema seria: a falha no levantamento de requisitos ou na modelagem do sistema de produção.
+                            </div>
+                        </li>
+                    </ul>
+                    Entender quais são as suas inconformidades e quais são os seus problemas é a única forma de realmente resolver os problemas. De outra maneira, apenas serão aplicadas ações paliativas que minimizam o desconforto e mascaram o problema, mas cedo ou tarde "a conta irá chegar". Um problema não resolvido tende a gerar novas inconformidades e prejuízos concretos, no médio e longo prazos.
+                </div>
+                <h3>Porque resolvemos um problema?</h3>
+                <div>
+                    A resposta é: para criar um cenário que contenha um problema ou problemas com os quais conseguimos conviver, onde os resultados sejam maximizados, oportunidades sejam criadas e prejuízos e incertezas reduzidas, em relação ao nosso objeto de análise.
+                </div>
+                <div class="reflection">
+                    Todos os problemas devem ser resolvidos?
+                </div>
+            </div>
+            <div id="clareza-resumido" style="display:none;">
+                <h2>Clareza (Resumo)</h2>
+                <p>
+                    Clareza é o ponto de partida para resolver qualquer problema de verdade. Antes de agir, aprofunde-se no entendimento do contexto, premissas, requisitos e restrições. Só assim é possível definir o objetivo certo e os critérios de sucesso adequados.
+                </p>
+                <table>
+                    <tr>
+                        <th>Conceito</th>
+                        <th>Definição</th>
+                        <th>Exemplo</th>
+                    </tr>
+                    <tr>
+                        <td>Objetivo</td>
+                        <td>Direção geral, aspiração maior, normalmente qualitativo</td>
+                        <td>Reduzir o tempo de resposta ao cliente</td>
+                    </tr>
+                    <tr>
+                        <td>Critério de Sucesso</td>
+                        <td>Resultado mensurável e específico que comprova o atingimento do objetivo</td>
+                        <td>Tempo médio de resposta abaixo de 2h em 95% dos casos</td>
+                    </tr>
+                    <tr>
+                        <td>Inconformidade</td>
+                        <td>Sintoma, o que está fora do padrão esperado</td>
+                        <td>Pedido entregue com atraso</td>
+                    </tr>
+                    <tr>
+                        <td>Problema</td>
+                        <td>Causa do sintoma, o que gera o desvio</td>
+                        <td>Falta de planejamento logístico</td>
+                    </tr>
+                </table>
+                <p>
+                    <b>Confusões comuns:</b> Muitas vezes, problema e inconformidade se sobrepõem. Exemplo: peça quebrada é inconformidade e problema. Mas se não há reposição, a inconformidade é a peça quebrada e o problema é a falta de planejamento de estoque.
+                </p>
+                <ul>
+                    <li>Entender a diferença entre sintoma e causa evita soluções paliativas.</li>
+                    <li>Nem todo problema precisa ser eliminado, mas sim compreendido e gerenciado.</li>
+                    <li>Descrever bem o problema é essencial: use 5W2H (Quem, Onde, O quê, Quando, Por quê, Como, Quanto).</li>
+                    <li>Problemas bem descritos facilitam o apoio, a priorização e a solução definitiva.</li>
+                </ul>
+                <p>
+                    <b>Reflexão:</b> Nem todo problema precisa ser resolvido imediatamente. Priorize o que realmente impacta o objetivo maior.
+                </p>
+            </div>
+        </div>
+        <div id="planejamento" class="tab-content">
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="toggle-btn" onclick="toggleResumo('planejamento')">Versão Resumida</button>
+            </div>
+            <div id="planejamento-completo">
+                <h2>Planejamento: definindo a direção e materializando as ações</h2>
+                <h3>O que é planejar?</h3>
+                <div>
+                    Planejar é o processo de definir objetivos, estabelecer prioridades, antecipar desafios e organizar recursos e ações de forma estratégica para alcançar os resultados desejados. É a base para tomar decisões conscientes e agir com clareza, evitando desperdícios e erros.
+                </div>
+                <h3>Resumo dos Três Níveis de Planejamento</h3>
+                <table>
+                    <tr>
+                        <th>Planejamento Estratégico</th>
+                        <th>Planejamento Tático</th>
+                        <th>Planejamento Operacional</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>O que é:</b> Nível mais amplo e abrangente, define missão, visão, valores e grandes objetivos de longo prazo.<br>
+                            <b>Responsável:</b> Alta liderança.<br>
+                            <b>Foco:</b> Direção geral, ambições de longo prazo.<br>
+                            <b>Exemplo:</b> “Ser referência nacional em atendimento ao cliente até 2030.”
+                        </td>
+                        <td>
+                            <b>O que é:</b> Nível intermediário, transforma objetivos estratégicos em planos concretos para áreas/setores.<br>
+                            <b>Responsável:</b> Gerentes e líderes intermediários.<br>
+                            <b>Foco:</b> Metas específicas, indicadores de desempenho, planos departamentais.<br>
+                            <b>Exemplo:</b> “Reduzir o tempo médio de atendimento em 30% no próximo ano (operações)” ou “Implantar novo sistema de treinamento em 6 meses (RH)”.
+                        </td>
+                        <td>
+                            <b>O que é:</b> Nível mais detalhado, garante execução eficiente das atividades diárias.<br>
+                            <b>Responsável:</b> Supervisores, equipes e colaboradores.<br>
+                            <b>Foco:</b> Cronogramas, procedimentos operacionais padrão, indicadores de desempenho.<br>
+                            <b>Exemplo:</b> “Realizar treinamentos semanais”, “Monitorar indicadores de satisfação diariamente”, “Ajustar escalas conforme demanda”.
+                        </td>
+                    </tr>
+                </table>
+                <div id="planejamento-estrategico"> <h3>Planejamento estratégico</h3>
+                    <div>
+                        <b>O que é?</b><br>
+                        O planejamento estratégico é o nível mais amplo e abrangente, responsável por estabelecer os objetivos de longo prazo da organização. Ele define a direção geral a ser seguida e serve como a base para todas as decisões futuras.
+                        <br><br>
+                        Seu escopo inclui análises detalhadas, como estudos de mercado, identificação de tendências e avaliação de oportunidades e riscos, geralmente com um horizonte de tempo superior a cinco anos. O principal objetivo desse planejamento é criar vantagens competitivas e posicionar a organização de maneira estratégica no mercado ou na sociedade. Para isso, são definidos a visão, a missão, os valores e os objetivos globais da organização, garantindo alinhamento e orientação para os líderes e executivos no mais alto nível.
+                        <div class="important">
+                            O resultado do <b>planejamento estratégico</b> é um plano estratégico que visa definir "<b>o porquê e o que precisa ser feito</b>" (nossa direção geral e ambições de longo prazo).
+                        </div>
+                        <h4>Missão, Visão, Valores e PTM</h4>
+                        <ul>
+                            <li><b>Missão:</b> O que você faz hoje, para quem e por quê. Ex: "Conectar pessoas e ideias através de tecnologia inovadora."</li>
+                            <li><b>Visão:</b> Onde você quer chegar no futuro. Ex: "Ser referência em design de interiores."</li>
+                            <li><b>Valores:</b> Princípios que guiam decisões e comportamentos. Ex: Inovação, Colaboração, Integridade, Foco no Cliente, Sustentabilidade.</li>
+                            <li><b>PTM:</b> Propósito Transformador Massivo. Ex: "Democratizar o acesso ao conhecimento global."</li>
+                        </ul>
+                        <h4>Cultura organizacional</h4>
+                        <div>
+                            A cultura organizacional é o conjunto de valores, crenças, costumes, rituais, normas e práticas compartilhadas pelos membros de uma organização. Ela guia o comportamento, cria identidade, atrai e retém talentos, influencia a performance, facilita a adaptação e impacta a relação com clientes e o mercado.
+                        </div>
+                        <h4>Você está tentando matar o seu negócio?</h4>
+                        <div>
+                            Tentar matar seu próprio negócio é imaginar cenários em que ele não seja mais necessário. Isso permite inovar antes que alguém o faça por você.
+                        </div>
+                    </div>
+                </div>
+                <div id="planejamento-tatico"> <h3>Planejamento tático</h3>
+                    <div>
+                        O <b>planejamento tático</b> é o nível intermediário, responsável por transformar os objetivos definidos no planejamento estratégico em planos concretos para diferentes áreas ou departamentos. Ele conecta a visão estratégica ao dia a dia das operações, garantindo que cada setor ou função contribua de forma alinhada com os objetivos globais da organização.
+                        <div class="important">
+                            O resultado do <b>planejamento tático</b> é um plano tático que visa definir "<b>como e por quem precisa ser feito</b>" (as ações de médio prazo para alcançar os objetivos estratégicos).
+                        </div>
+                        <h4>Diferença entre inação e preparação</h4>
+                        <div>
+                            Inação é a falta de movimento ou decisão, muitas vezes fruto de medo, dúvida ou procrastinação. Preparação é planejamento ativo para agir com base sólida.
+                        </div>
+                        <h4>Diferença entre ação e precipitação</h4>
+                        <div>
+                            Ação é movimento consciente e planejado; precipitação é agir sem reflexão, levando a erros.
+                        </div>
+                        <h4>Porque planejar?</h4>
+                        <div>
+                            Planejar transforma intenções em resultados concretos, reduz incerteza, antecipa riscos e otimiza recursos. A comunicação é essencial para garantir execução alinhada.
+                        </div>
+                        <div class="important">
+                            A comunicação é a única ferramenta capaz de fornecer o equilíbrio entre intuição e planejamento.
+                        </div>
+                        <h4>Se manter firme ou mudar?</h4>
+                        <div>
+                            Estratégia de impacto combina resiliência para continuar, clareza para corrigir e coragem para desistir do que não dá certo.
+                        </div>
+                        <h4>Quando mudar?</h4>
+                        <div>
+                            Mude quando o curso não está seguindo o planejado, surgem problemas inesperados ou oportunidades melhores. Avalie o custo de oportunidade antes de decidir.
+                        </div>
+                        <div class="important">
+                            A decisão de mudar deve equilibrar o risco de continuar com o custo de mudar.
+                        </div>
+                        <h4>Quando aguardar?</h4>
+                        <div>
+                            Espere quando benefícios e problemas ainda estão dentro do esperado. A paciência estratégica evita decisões impulsivas.
+                        </div>
+                        <div class="important">
+                            Saber esperar é tão importante quanto saber mudar.
+                        </div>
+                    </div>
+                </div>
+                <div id="planejamento-operacional"> <h3>Planejamento operacional</h3>
+                    <div>
+                        O <b>planejamento operacional</b> é o nível mais detalhado dentro da estrutura organizacional. Ele é responsável por garantir que as atividades diárias sejam executadas de forma eficiente e conforme os objetivos definidos nos níveis estratégico e tático.<br><br>
+                        Seu escopo inclui cronogramas, procedimentos e alocação de recursos para tarefas específicas. O principal objetivo é assegurar a execução eficaz das operações, transformando planos táticos em resultados concretos e mensuráveis.
+                        <div class="important">
+                            O resultado do <b>planejamento operacional</b> é um plano operacional que visa definir "<b>quando, onde e quanto precisa ser feito</b>".
+                        </div>
+                        <h4>O que é uma estratégia de implementação?</h4>
+                        <div>
+                            Divida a execução em etapas detalhadas, deixando claro o resultado e critério de sucesso em cada uma.
+                        </div>
+                        <h4>Porque usar ferramentas?</h4>
+                        <div>
+                            Ferramentas como 5W2H maximizam resultados e reduzem riscos. Exemplo:
+                            <table>
+                                <tr>
+                                    <th>Pergunta (5W2H)</th>
+                                    <th>Implantação de um programa de mentoria interna para novos agentes de cobrança.</th>
+                                </tr>
+                                <tr>
+                                    <td><b>What?</b></td>
+                                    <td>Criar e implementar um programa de mentoria formal, conectando agentes experientes a novos contratados para suporte técnico e cultural nos primeiros 3 meses.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Why?</b></td>
+                                    <td>Reduzir a alta rotatividade, integrar rapidamente o conhecimento da equipe e aumentar a motivação e senso de pertencimento.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Where?</b></td>
+                                    <td>Encontros semanais na sala de reuniões da empresa. Acompanhamento e materiais em pasta compartilhada.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>When?</b></td>
+                                    <td>Design do programa: 01-15/06; Recrutamento de mentores e mentorados: 2 -30/06; Início dos ciclos de mentoria: 01/07. Avaliação mensal.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Who?</b></td>
+                                    <td>Supervisor de Cobrança (coordenação), Analista de RH (apoio), Agentes de Cobrança Sêniores (mentores), Novos Agentes de Cobrança (mentorados).</td>
+                                </tr>
+                                <tr>
+                                    <td><b>How?</b></td>
+                                    <td>Definir critérios para mentores, criar manual, treinar mentores, parear mentor/mentorado, agendar encontros, coletar feedback, ajustar o programa.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>How much?</b></td>
+                                    <td>R$ 0 para consultoria externa, R$ X para materiais, R$ Y para reconhecimentos não financeiros.</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="planejamento-resumido" style="display:none;">
+                <h2>Planejamento (Resumo)</h2>
+                <p>
+                    Planejar é definir objetivos, priorizar, antecipar desafios e organizar recursos para transformar intenções em resultados concretos, evitando desperdícios e erros. O planejamento é estruturado em três níveis, que se complementam e garantem o alinhamento da organização do estratégico ao operacional.
+                </p>
+                <table>
+                    <tr>
+                        <th>Nível</th>
+                        <th>Horizonte</th>
+                        <th>Responsável</th>
+                        <th>Foco</th>
+                        <th>Exemplo Prático</th>
+                    </tr>
+                    <tr>
+                        <td><b>Estratégico</b></td>
+                        <td>Longo prazo<br>(5 a 10 anos)</td>
+                        <td>Alta liderança</td>
+                        <td>Missão, visão, valores, grandes objetivos, posicionamento de mercado</td>
+                        <td>
+                            <b>Objetivo:</b> Expandir a empresa para 3 novos países até 2028<br>
+                            <b>Ação:</b> Investir em marketing internacional, adaptar produtos<br>
+                            <b>Resultado esperado:</b> Aumentar receita global em 20%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Tático</b></td>
+                        <td>Médio prazo<br>(1 a 3 anos)</td>
+                        <td>Gerentes e líderes de áreas</td>
+                        <td>Metas específicas, planos por área, recursos e responsáveis, integração entre setores</td>
+                        <td>
+                            <b>Objetivo:</b> Aumentar a produção em 20% em 2 anos<br>
+                            <b>Ação:</b> Comprar novos equipamentos, contratar e treinar equipe<br>
+                            <b>Resultado esperado:</b> Capacidade ampliada para atender novos mercados
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Operacional</b></td>
+                        <td>Curto prazo<br>(dias a 1 ano)</td>
+                        <td>Supervisores, equipes</td>
+                        <td>Execução diária, tarefas detalhadas, indicadores de desempenho, rotinas e procedimentos</td>
+                        <td>
+                            <b>Objetivo:</b> Garantir entregas diárias no prazo<br>
+                            <b>Ação:</b> Definir metas diárias, monitorar indicadores, treinar colaboradores<br>
+                            <b>Resultado esperado:</b> 98% das entregas realizadas sem atraso
+                        </td>
+                    </tr>
+                </table>
+                <h3>Como os níveis se conectam?</h3>
+                <ul>
+                    <li>O <b>estratégico</b> define o "porquê" e "o que" (direção e ambição).</li>
+                    <li>O <b>tático</b> detalha "como" e "por quem" (planos por área/setor, metas intermediárias).</li>
+                    <li>O <b>operacional</b> executa "quando", "onde" e "quanto" (tarefas, rotinas, indicadores).</li>
+                    <li>Sem o operacional, o tático não se realiza; sem o tático, o estratégico não sai do papel.</li>
+                </ul>
+                <h3>Ferramentas e práticas essenciais</h3>
+                <ul>
+                    <li><b>5W2H:</b> Detalha <i>O que</i>, <i>Por que</i>, <i>Onde</i>, <i>Quando</i>, <i>Quem</i>, <i>Como</i> e <i>Quanto</i> para cada ação.</li>
+                    <li><b>Comunicação clara:</b> Evita ruídos, engaja equipes e garante alinhamento.</li>
+                    <li><b>Flexibilidade:</b> Planejar não é engessar, mas sim antecipar riscos e adaptar-se a mudanças.</li>
+                    <li><b>Exemplo de 5W2H aplicado:</b>
+                        <ul>
+                            <li><b>What?</b> Implantar mentoria para novos colaboradores</li>
+                            <li><b>Why?</b> Reduzir rotatividade e acelerar integração</li>
+                            <li><b>Where?</b> Sede da empresa</li>
+                            <li><b>When?</b> Início em julho, avaliação mensal</li>
+                            <li><b>Who?</b> RH, supervisores e mentores</li>
+                            <li><b>How?</b> Treinamento, reuniões semanais, feedbacks</li>
+                            <li><b>How much?</b> R$ 0 para consultoria, R$ X para materiais</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>Pontos críticos e aprendizados</h3>
+                <ul>
+                    <li>Planejar é equilibrar intuição e método: comunicação é a ponte.</li>
+                    <li>Inação é diferente de preparação; ação é diferente de precipitação.</li>
+                    <li>Estratégia de impacto combina resiliência, clareza para corrigir e coragem para mudar.</li>
+                    <li>Nem sempre resultados imediatos indicam a hora de mudar: avalie problemas, benefícios e custos de oportunidade.</li>
+                    <li>Saber esperar é tão importante quanto saber mudar.</li>
+                    <li>Exemplo negativo: Sony não se antecipou à disrupção do seu negócio (Walkman vs. iPod/Spotify).</li>
+                </ul>
+                <h3>Resumo em uma frase</h3>
+                <blockquote>
+                    <b>Estratégico</b>: define a direção e o sonho grande.<br>
+                    <b>Tático</b>: transforma a estratégia em planos e metas por área.<br>
+                    <b>Operacional</b>: faz acontecer no dia a dia, com disciplina e indicadores.
+                </blockquote>
+            </div>
+        </div>
+
+        <div id="monitoramento" class="tab-content">
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="toggle-btn" onclick="toggleResumo('monitoramento')">Versão Resumida</button>
+            </div>
+            <div id="monitoramento-completo">
+                <h2>Monitoramento: controlando o progresso e coletando evidências</h2>
+                <h3>O Coração da execução eficaz</h3>
+                <div>
+                    A <b>fase de monitoramento</b> é a etapa vital do planejamento que funciona como os "olhos e ouvidos" do seu plano estratégico. É nela que você <b>acompanha de perto o progresso</b> das suas estratégias e ações operacionais, garantindo que tudo esteja se desenvolvendo conforme o esperado.
+                </div>
+                <h3>Para que Serve o Monitoramento?</h3>
+                <div>
+                    Essa fase serve, essencialmente, para <b>validar e rastrear o curso das suas ações</b>, permitindo que você:
+                    <ul>
+                        <li><b>Verifique o alinhamento:</b> Compare o que está sendo executado com o que foi planejado, assegurando que o caminho está correto.</li>
+                        <li><b>Identifique desvios iniciais:</b> Detecte problemas, gargalos ou oportunidades emergentes logo no início, no seu desenvolvimento humano e na melhoria tecnológica.</li>
+                        <li><b>Colete dados objetivos:</b> Reúna informações concretas sobre o desempenho das suas estratégias e ações, criando uma base para futuras análises.</li>
+                        <li><b>Comunique o progresso:</b> Mantenha a equipe e a liderança informadas sobre o status atual e os primeiros resultados alcançados.</li>
+                    </ul>
+                </div>
+                <h3>Como Implementar um Monitoramento Eficaz?</h3>
+                <div>
+                    Para que o monitoramento seja realmente produtivo e eficaz se faz necessário:
+                    <ul>
+                        <li><b>Definir indicadores de desempenho (KPIs) Claros:</b> Escolha <b>métricas objetivas e relevantes</b> que permitam acompanhar o progresso das ações e a performance em relação aos resultados esperados.</li>
+                        <li><b>Estabelecer rotinas de acompanhamento:</b> Programe <b>revisões periódicas</b> (semanal, quinzenal ou mensal) para analisar o andamento das tarefas, verificar o uso dos recursos e identificar potenciais desvios.</li>
+                        <li><b>Utilizar Ferramentas Adequadas:</b> Empregue painéis de controle visuais (dashboards), relatórios e sistemas de gestão que facilitem a <b>visualização do status</b> das ações e a identificação de pontos de atenção.</li>
+                        <li><b>Documentar o processo:</b> Mantenha um <b>registro sistemático</b> do progresso, dos dados coletados, dos problemas observados e de quaisquer informações relevantes. Isso cria um histórico valioso e suporta o aprendizado contínuo.</li>
+                    </ul>
+                </div>
+                <div class="example">
+                    Exemplo: Painel semanal de entregas, mostrando percentuais no prazo, atrasos e causas dos desvios.
+                </div>
+                <div class="important">
+                    O monitoramento, por si só, é a coleta e apresentação de fatos. Ele não inclui a decisão de mudar o curso ou dar feedback corretivo, mas fornece a inteligência necessária para que essas etapas posteriores sejam eficazes.
+                </div>
+            </div>
+            <div id="monitoramento-resumido" style="display:none;">
+                <h2>Monitoramento (Resumo)</h2>
+                <p>
+                    Monitoramento é o acompanhamento sistemático do progresso das ações planejadas. Ele fornece inteligência para ajustes e decisões futuras.
+                </p>
+                <table>
+                    <tr>
+                        <th>Etapa</th>
+                        <th>O que fazer</th>
+                        <th>Exemplo</th>
+                    </tr>
+                    <tr>
+                        <td>Definir KPIs</td>
+                        <td>Escolher métricas objetivas e relevantes</td>
+                        <td>% de entregas no prazo, NPS mensal</td>
+                    </tr>
+                    <tr>
+                        <td>Rotinas de acompanhamento</td>
+                        <td>Revisões periódicas (semanais, mensais)</td>
+                        <td>Reunião de status toda segunda-feira</td>
+                    </tr>
+                    <tr>
+                        <td>Ferramentas</td>
+                        <td>Dashboards, relatórios, planilhas</td>
+                        <td>Kanban digital, painel de KPIs</td>
+                    </tr>
+                    <tr>
+                        <td>Documentação</td>
+                        <td>Registrar progresso e aprendizados</td>
+                        <td>Relatório mensal de desempenho</td>
+                    </tr>
+                </table>
+                <ul>
+                    <li>Monitorar é observar e registrar fatos, não decidir ou corrigir.</li>
+                    <li>Permite detectar desvios, coletar dados e comunicar avanços.</li>
+                    <li><b>Exemplo:</b> Painel semanal mostra entregas no prazo, atrasos e causas.</li>
+                    <li>Documentação sistemática facilita aprendizado contínuo e evita repetição de erros.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="feedback" class="tab-content">
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="toggle-btn" onclick="toggleResumo('feedback')">Versão Resumida</button>
+            </div>
+            <div id="feedback-completo">
+                <h2>Feedback: traduzindo dados em insights e orientação</h2>
+                <h3>Otimizando o Desempenho e o Engajamento</h3>
+                <div>
+                    A <b>fase de feedback</b> é o momento essencial em que as informações coletadas durante o <b>monitoramento</b> são traduzidas em insights práticos e direcionamentos. Ela atua como uma ponte crítica entre o acompanhamento do que foi feito e a necessidade de otimizar o caminho à frente. É a oportunidade de <b>validar ou ajustar a rota</b> das suas estratégias e ações, com base nos dados reais de desempenho.
+                </div>
+                <h3>Por que o Feedback é Crucial Nesta Etapa?</h3>
+                <div>
+                    Neste contexto de planejamento e execução, o feedback serve para:
+                    <ul>
+                        <li><b>Transformar Dados em Conhecimento Acionável:</b> Ele pega os números e observações do monitoramento e os converte em entendimentos claros sobre o que está funcionando e o que precisa ser ajustado na estratégia.</li>
+                        <li><b>Orientar o Desempenho da Estratégia:</b> Permite que as equipes e líderes recebam informações específicas sobre o progresso e o impacto das ações, habilitando-os a corrigir desvios ou potencializar acertos.</li>
+                        <li><b>Impulsionar o Alinhamento e o Engajamento:</b> Ao apresentar os resultados do monitoramento de forma construtiva, o feedback mantém todos na mesma página, reforçando o senso de propósito e corresponsabilidade pelos resultados.</li>
+                        <li><b>Preparar para a Correção de Curso:</b> É a etapa que diagnostica a situação atual, fornecendo a clareza necessária para que as próximas decisões e ajustes sejam tomados com precisão.</li>
+                    </ul>
+                </div>
+                <h3>Como a Análise de Dados Alimenta o Feedback Preciso:</h3>
+                <div>
+                    Para que o feedback seja efetivo nesta fase, é fundamental que ele esteja solidamente embasado nas informações do monitoramento:
+                    <ul>
+                        <li><b>Analise os Dados Gerados:</b> O ponto de partida é a <b>interpretação criteriosa dos KPIs e das informações qualitativas</b> coletadas. Busque por tendências, padrões, variações significativas e anomalias que indiquem sucesso ou desafios. Essa análise profunda dos fatos é o que confere credibilidade e objetividade ao feedback.</li>
+                        <li><b>Conecte Dados a Comportamentos/Ações:</b> Identifique quais comportamentos ou ações específicas (ou a falta deles) estão diretamente relacionados aos dados observados. Por exemplo, se a taxa de participação na mentoria está baixa, o feedback não é apenas "a taxa está baixa", mas "a baixa divulgação da agenda pode estar afetar a participação".</li>
+                        <li><b>Prepare a Mensagem com Foco nos Resultados:</b> Organize as conclusões da análise de dados de forma que a devolutiva seja clara, objetiva e foque no impacto das ações da estratégia. Use os dados para ilustrar o ponto, seja ele positivo ou uma área de melhoria.</li>
+                    </ul>
+                    <br>
+                    Ao realizar essa análise e estruturar o feedback com base nos dados do monitoramento, você garante que as conversas sejam produtivas, direcionadas e contribuam diretamente para a <b>evolução das estratégias</b> e o alcance dos objetivos estabelecidos.
+                </div>
+            </div>
+            <div id="feedback-resumido" style="display:none;">
+                <h2>Feedback (Resumo)</h2>
+                <p>
+                    Feedback é o momento de transformar dados do monitoramento em orientação prática, insights e alinhamento para a equipe.
+                </p>
+                <table>
+                    <tr>
+                        <th>Função</th>
+                        <th>Como fazer</th>
+                        <th>Exemplo</th>
+                    </tr>
+                    <tr>
+                        <td>Transformar dados em ação</td>
+                        <td>Analisar KPIs, identificar padrões e desvios</td>
+                        <td>A queda no NPS está ligada à demora no atendimento</td>
+                    </tr>
+                    <tr>
+                        <td>Orientar equipes</td>
+                        <td>Conectar fatos a comportamentos</td>
+                        <td>Baixa participação na mentoria? Verifique divulgação da agenda</td>
+                    </tr>
+                    <tr>
+                        <td>Preparar para ajustes</td>
+                        <td>Apresentar resultados de forma construtiva</td>
+                        <td>Resultados abaixo da meta? Avaliar causas antes de agir</td>
+                    </tr>
+                </table>
+                <ul>
+                    <li>Feedback é sempre baseado em fatos e apresentado com foco em resultados.</li>
+                    <li>Alinha equipes, reforça propósito e antecipa correções de rota.</li>
+                    <li>Exemplo: Após analisar o painel de entregas, equipe identifica que atrasos decorrem de sobrecarga em um setor específico.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="correcao" class="tab-content">
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="toggle-btn" onclick="toggleResumo('correcao')">Versão Resumida</button>
+            </div>
+            <div id="correcao-completo">
+                <h2>Correção de curso: ajustando a rota e materializando o aprendizado</h2>
+                <div>
+                    A fase de <b>correção de curso</b> é a etapa de ação que sucede o monitoramento e o feedback. É aqui que as informações coletadas e as análises realizadas se transformam em <b>mudanças concretas</b> no plano. Seu propósito é simples: ajustar o que não está funcionando ou potencializar o que está dando certo, garantindo que a estratégia volte (ou se mantenha) no caminho para alcançar os objetivos.<br><br>
+                    Não se trata de um sinal de falha, mas sim de uma parte natural e essencial de qualquer planejamento dinâmico. É a capacidade de se adaptar que diferencia um plano rígido de um plano verdadeiramente eficaz.
+                </div>
+                <h3>Fundamentos para uma Correção de Curso Eficaz:</h3>
+                <div>
+                    Para que a correção de curso seja bem-sucedida e gere o impacto desejado, se faz necessário seguir alguns princípios:
+                    <ul>
+                        <li><b>Analise Profundamente as Causas dos Desvios:</b> Vá além do sintoma. Use ferramentas como o <b>5 Porquês</b> ou o <b>Diagrama de Ishikawa (Espinha de Peixe)</b> para desvendar as <b>raízes dos problemas</b> ou dos resultados insatisfatórios identificados no monitoramento e feedback. Pergunte-se "por que isso aconteceu?" repetidamente até chegar à causa fundamental. Isso evita soluções paliativas e garante que o ajuste seja duradouro, atacando o cerne da questão.</li>
+                        <li><b>Avalie Alternativas e Impactos Sistematicamente:</b> Não adote a primeira ideia. Envolva a equipe na <b>geração de múltiplas opções de ajuste</b>, desde pequenos retoques até mudanças mais significativas. Para cada alternativa, projete os potenciais <b>custos</b> (financiários, de tempo, de recursos), <b>benefícios</b> esperados e, crucialmente, os <b>riscos</b> e <b>impactos</b> nas diversas áreas e equipes envolvidas. Compare-as objetivamente antes de tomar uma decisão, priorizando a que oferece o melhor custo-benefício e menor risco.</li>
+                        <li><b>Se Necessário, redefina ações e metas com precisão:</b> Com base na análise e na alternativa escolhida, <b>atualize o plano de implementação de forma detalhada</b>. Isso pode envolver:
+                            <ul>
+                                <li><b>Ajustar tarefas:</b> Incluir novas atividades ou remover as ineficazes.</li>
+                                <li><b>Redefinir prazos:</b> Estender ou encurtar cronogramas com base na nova realidade.</li>
+                                <li><b>Realocar recursos:</b> Otimizar a distribuição de pessoas, orçamento e ferramentas.</li>
+                                <li><b>Recalibrar metas:</b> Em casos extremos, se o cenário mudou drasticamente, ajustar os objetivos de forma realista, mas ainda desafiadora.</li>
+                            </ul>
+                        </li>
+                        <li><b>Comunique as Mudanças Claramente e com Propósito:</b> A transparência é vital. <b>Explique de forma inequívoca</b> o que será alterado, <i>por que</i> a mudança é necessária (conectando-a aos dados do monitoramento e feedback) e <i>como</i> isso impacta cada envolvido. Utilize diferentes canais de comunicação (reuniões, comunicados) para garantir que todos compreendam o novo direcionamento, suas novas responsabilidades e o papel de cada um no sucesso da correção, mantendo o engajamento e a adesão.</li>
+                        <li><b>Implemente Rapidamente e Monitore os Efeitos:</b> Uma vez decidida e comunicada a correção, execute-a com <b>agilidade</b>. Em seguida, retorne imediatamente ao <b>ciclo de monitoramento e feedback</b> com os novos parâmetros. Esta fase de re-monitoramento é crucial para acompanhar de perto os efeitos dos ajustes realizados, coletar novos dados e confirmar se a correção está surtindo o efeito desejado ou se são necessários mais refinamentos.</li>
+                        <li><b>Aprenda com o processo e Crie uma base de conhecimento:</b> Cada correção de curso é uma valiosa oportunidade de aprendizado. <b>Documente as lições aprendidas</b> de forma estruturada: o que funcionou, o que não funcionou, as causas dos problemas e as soluções adotadas. Crie um repositório de conhecimento para que esses aprendizados possam ser consultados em projetos futuros, evitando reincidências e fortalecendo a cultura de melhoria contínua e adaptabilidade da organização.</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="correcao-resumido" style="display:none;">
+                <h2>Correção de curso (Resumo)</h2>
+                <p>
+                    Corrigir o curso é agir sobre fatos, ajustando o plano para garantir que os objetivos sejam alcançados. Não é sinal de fracasso, mas parte essencial de qualquer planejamento dinâmico.
+                </p>
+                <table>
+                    <tr>
+                        <th>Passo</th>
+                        <th>O que fazer</th>
+                        <th>Exemplo</th>
+                    </tr>
+                    <tr>
+                        <td>Analisar causas</td>
+                        <td>Usar 5 Porquês, Espinha de Peixe</td>
+                        <td>Por que o prazo estourou? Falta de recurso? Falha de processo?</td>
+                    </tr>
+                    <tr>
+                        <td>Avaliar alternativas</td>
+                        <td>Listar opções, estimar custos/benefícios</td>
+                        <td>Trocar fornecedor, ajustar cronograma, realocar equipe</td>
+                    </tr>
+                    <tr>
+                        <td>Redefinir plano</td>
+                        <td>Atualizar tarefas, prazos, recursos</td>
+                        <td>Nova meta: entrega em 15 dias, com equipe reforçada</td>
+                    </tr>
+                    <tr>
+                        <td>Comunicar e monitorar</td>
+                        <td>Explicar mudanças e acompanhar efeitos</td>
+                        <td>Reunião de alinhamento e novo acompanhamento semanal</td>
+                    </tr>
+                    <tr>
+                        <td>Documentar aprendizados</td>
+                        <td>Registrar o que funcionou e o que não funcionou</td>
+                        <td>Base de conhecimento para projetos futuros</td>
+                    </tr>
+                </table>
+                <ul>
+                    <li>Corrigir o curso é agir sobre fatos, não opiniões.</li>
+                    <li>Envolva a equipe na análise, comunicação e execução das mudanças.</li>
+                    <li>Cada ajuste é uma oportunidade de aprendizado e evolução.</li>
+                    <li>Exemplo: Após atrasos recorrentes, equipe identifica causa raiz, redefine processos e acompanha resultados em ciclos curtos.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateTabIndicator() {
+            const tabButtonsContainer = document.getElementById('tabButtons');
+            const activeTab = document.querySelector('.tablink.active');
+            const indicator = document.getElementById('tabIndicator');
+
+            if (activeTab && indicator && tabButtonsContainer) {
+                indicator.style.width = activeTab.offsetWidth + "px";
+                indicator.style.left = activeTab.offsetLeft + "px";
+            }
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+                // Força o reflow/repaint em iOS após remover a classe
+                void tabcontent[i].offsetWidth; 
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+                // Força o reflow/repaint em iOS após remover a classe
+                void tablinks[i].offsetWidth; 
+            }
+            
+            const selectedTabContent = document.getElementById(tabName);
+            selectedTabContent.classList.add("active");
+            // Força o reflow/repaint em iOS após adicionar a classe
+            void selectedTabContent.offsetWidth; 
+
+            if (evt) {
+                evt.currentTarget.classList.add("active");
+                // Força o reflow/repaint em iOS após adicionar a classe ao botão
+                void evt.currentTarget.offsetWidth;
+            }
+            
+            // Reseta a visualização do conteúdo para a versão completa ao ativar a aba
+            const completoDiv = selectedTabContent.querySelector('[id$="-completo"]');
+            const resumidoDiv = selectedTabContent.querySelector('[id$="-resumido"]');
+            const toggleBtn = selectedTabContent.querySelector('.toggle-btn');
+
+            if (completoDiv && resumidoDiv && toggleBtn) {
+                completoDiv.style.display = ''; // Mostra a versão completa
+                resumidoDiv.style.display = 'none'; // Esconde a versão resumida
+                toggleBtn.textContent = 'Versão Resumida'; // Reseta o texto do botão
+                void completoDiv.offsetWidth; // Força o reflow
+            }
+
+            updateTabIndicator(); 
+        }
+
+        function openTabByName(tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+                void tabcontent[i].offsetWidth;
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+                void tablinks[i].offsetWidth;
+            }
+            
+            let mainTabId = tabName;
+            let scrollToElement = null;
+
+            if (tabName.startsWith('planejamento-')) {
+                mainTabId = 'planejamento'; 
+                scrollToElement = document.getElementById(tabName); 
+            }
+            
+            const selectedTabContent = document.getElementById(mainTabId);
+            selectedTabContent.classList.add("active");
+            void selectedTabContent.offsetWidth;
+            
+            // Reseta a visualização do conteúdo para a versão completa ao ativar a aba
+            const completoDiv = selectedTabContent.querySelector('[id$="-completo"]');
+            const resumidoDiv = selectedTabContent.querySelector('[id$="-resumido"]');
+            const toggleBtn = selectedTabContent.querySelector('.toggle-btn');
+
+            if (completoDiv && resumidoDiv && toggleBtn) {
+                completoDiv.style.display = ''; 
+                resumidoDiv.style.display = 'none'; 
+                toggleBtn.textContent = 'Versão Resumida'; 
+                void completoDiv.offsetWidth;
+            }
+
+            var btns = document.getElementsByClassName("tablink");
+            var tabMap = {
+                'sumario': 0,
+                'clareza': 1,
+                'planejamento': 2,
+                'monitoramento': 3,
+                'feedback': 4,
+                'correcao': 5
+            };
+            if (btns[tabMap[mainTabId]]) {
+                btns[tabMap[mainTabId]].classList.add('active');
+                void btns[tabMap[mainTabId]].offsetWidth;
+            }
+
+            updateTabIndicator(); 
+
+            if (scrollToElement) {
+                setTimeout(() => {
+                    scrollToElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100); 
+            } else {
+                document.getElementById(mainTabId).scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
+        function toggleResumo(slide) {
+            var completo = document.getElementById(slide + '-completo');
+            var resumido = document.getElementById(slide + '-resumido');
+            var btn = document.querySelector('#' + slide + ' .toggle-btn');
+            if (completo.style.display === 'none') {
+                completo.style.display = '';
+                resumido.style.display = 'none';
+                btn.textContent = 'Versão Resumida';
+            } else {
+                completo.style.display = 'none';
+                resumido.style.display = '';
+                btn.textContent = 'Versão Completa';
+            }
+        }
+        
+        window.addEventListener('resize', updateTabIndicator);
+        document.addEventListener("DOMContentLoaded", function() {
+            openTab(null, 'sumario');
+            updateTabIndicator();
+        });
+    </script>
+</body>
+</html>
